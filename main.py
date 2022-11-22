@@ -33,91 +33,88 @@ matriz = [
 ]
 
 matriz = [
-    [["x1", -1],     ["x2", Compuesto(2, 2)],     ["s1", Compuesto(0, -1)],     ["s2", Compuesto(0, -1)],     ["r1", 0], ["r2", 0],["x5", 0],   ["Sol", Compuesto(0, 3)]],
+    [["x1", -1],     ["x2", M(2, 2)],     ["s1", M(0, -1)],     ["s2", M(0, -1)],     ["r1", 0], ["r2", 0],["x5", 0],   ["Sol", M(0, 3)]],
     [["s1", 1],     [None, 1],      [None, -1],     [None, 0],      [None, 1],      [None, 0],      [None, 0], [None, 2]],
     [["r1", -1],     [None, 1],      [None, 0],     [None, -1],      [None, 0],      [None, 1],      [None, 0], [None, 1]],
     [["r2", 0],     [None, 1],      [None, 0],     [None, 0],      [None, 0],      [None, 0],      [None, 1], [None, 3]],
 ]
 """
 
-class Compuesto:
-    def __init__(self, i, m):
-        self.i = Fraction(Decimal(i)) if type(i) != Fraction else i
-        self.m = m
+class M:
+    def __init__(self, m, i=0):
+        self.m = Fraction(m).limit_denominator() if type(m) != Fraction else m
+        self.i = Fraction(i).limit_denominator() if type(i) != Fraction else i
 
     def __int__(self):
         return self.m * 1000 + self.i
 
     def __add__(self, other):
-        if type(other) == Compuesto:
-            return Compuesto(self.i + other.i, self.m + other.m)
+        if type(other) == M:
+            return M(self.m + other.m, self.i + other.i)
         else:
-            return Compuesto(self.i + other, self.m)
+            return M(self.m, self.i + Fraction(other))
 
     def __radd__(self, other):
-        return self.__add__(other)
+        return self.__add__(Fraction(other))
 
     def __sub__(self, other):
-        if type(other) == Compuesto:
-            return Compuesto(self.i - other.i, self.m - other.m)
+        if type(other) == M:
+            return M(self.m - other.m, self.i - other.i)
         else:
-            return Compuesto(self.i - other, self.m)
+            return M(self.m, self.i - Fracion(other))
 
     def __rsub__(self, other):
-        return self.__sub__(other)
+        return self.__sub__(Fraction(other))
 
     def __mul__(self, other):
-        if type(other) == Compuesto:
-            return Compuesto(self.i * other.i, self.m * other.m)
+        if type(other) == M:
+            return M(self.m * other.m, self.i * other.i)
         else:
-            return Compuesto(self.i * other, self.m * other)
+            return M(self.m * Fraction(other), self.i * Fraction(other))
 
     def __rmul__(self, other):
-        return self.__mul__(other)
+        return self.__mul__(Fraction(other))
 
     def __truediv__(self, other):
-        if type(other) == Compuesto:
-            return Compuesto(0 if self.i == 0 or other.i == 0 else self.i/other.i, 0 if self.i == 0 or other.i == 0 else self.m/other.m)
+        if type(other) == M:
+            return M(
+                Fraction(self.m/other.m),
+                Fraction(self.i/other.i)
+            )
         else:
-            return Compuesto(self.i/other, self.m)
+            return M(
+                self.m,
+                Fraction(self.i/Fraction(other))
+            )
 
     def __repr__(self):
         return self.__str__()
 
+    def __float__(self):
+        return float(self.m * 1000 + self.i)
+
     def __str__(self):
         if self.m == 0:
-            return f"{str(self.i)}"
+            return f"{Fraction(str(self.i))}"
         elif self.i == 0:
-            return f"{self.m}M"
+            return f"{Fraction(self.m)}M"
         else:
-            return f"({self.m}M" + "," + f"{self.i})"
+            return f"({Fraction(self.m)}M" + "," + f"{Fraction(self.i)})"
 
     def __ge__(self, other):
-        if type(other) == Compuesto:
-            return self.i + int(self.m) * 1000 >= other.i + int(other.m) * 1000
-        else:
-            return self.i + int(self.m) * 1000 >= other
+        return float(self) >= float(other)
 
     def __le__(self, other):
-        if type(other) == Compuesto:
-            return self.i + int(self.m) * 1000 <= other.i + int(other.m) * 1000
-        else:
-            return self.i + int(self.m) * 1000 <= other
+        return float(self) <= float(other)
 
     def __gt__(self, other):
-        if type(other) == Compuesto:
-            return self.i + int(self.m) * 1000 > other.i + int(other.m) * 1000
-        else:
-            return self.i + int(self.m) * 1000 > other
+        return float(self) > float(other)
 
     def __lt__(self, other):
-        if type(other) == Compuesto:
-            return self.i + int(self.m) * 1000 < other.i + int(other.m) * 1000
-        else:
-            return self.i + int(self.m) * 1000 < other
+        return float(self) < float(other)
 
     def __itruediv__(self, other):
-        self = self.__truediv__(other)
+        self = self.__truediv__(Fraction(other))
 
 
 class C:
@@ -137,8 +134,11 @@ class Simplex:
     def __init__(self, matriz, es_maximizar: bool = True):
         for j in range(len(matriz)):
             for i in range(len(matriz[0])):
-                if type(matriz[j][i][1]) != Compuesto:
-                    matriz[j][i][1] = Fraction(Decimal(matriz[j][i][1]))
+                if type(matriz[j][i]) == list:
+                    if type(matriz[j][i][1]) != M:
+                        matriz[j][i][1] = Fraction(matriz[j][i][1]).limit_denominator()
+                else:
+                    matriz[j][i] = [None, Fraction(matriz[j][i]).limit_denominator()]
         self.es_maximizar = es_maximizar
         self.es_minimizar = not es_maximizar
         self.matriz = matriz
@@ -151,25 +151,19 @@ class Simplex:
 
     def stop_iter_max(self):
         non_negative = [
-                1 if self.matriz[0][i][1] >= 0 else
+                1 if self.matriz[0][i][1] >= M(0) else
                 0 for i in range(len(self.matriz[0])-1)
         ]
-        #print(non_negative)
-        if sum(non_negative) == len(self.matriz[0])-1:
-            return True
-
-        return False
+        # print(non_negative)
+        return sum(non_negative) == len(self.matriz[0])-1
 
     def stop_iter_min(self):
         non_positive = [
-                1 if self.matriz[0][i][1] <= 0 else
+                1 if self.matriz[0][i][1] <= M(0) else
                 0 for i in range(len(self.matriz[0])-1)
         ]
-        #print(non_positive)
-        if sum(non_positive) == len(self.matriz[0])-1:
-            return True
-
-        return False
+        # print(non_positive)
+        return sum(non_positive) == len(self.matriz[0])-1
 
     def __str__(self):
         result = ""
@@ -226,9 +220,11 @@ class Simplex:
                 if self.matriz[0][i][1] == 0:
                     continue
                 if menor is None:
+                    # print("Primer menor:", self.matriz[0][i][1])
                     menor = self.matriz[0][i][1]
                     j = i
                 elif self.matriz[0][i][1] < menor:
+                    # print("Menor:", self.matriz[0][i][1])
                     menor = self.matriz[0][i][1]
                     j = i
         elif not es_maximizar:
@@ -237,14 +233,15 @@ class Simplex:
                 if self.matriz[0][i][1] == 0:
                     continue
                 if mayor is None:
-                    #print("Primer menor:", self.matriz[0][i][1])
+                    # print("Primer menor:", self.matriz[0][i][1])
                     mayor = self.matriz[0][i][1]
                     j = i
                 elif self.matriz[0][i][1] > mayor:
-                    #print("Menor:", self.matriz[0][i][1])
+                    # print("Menor:", self.matriz[0][i][1])
                     mayor = self.matriz[0][i][1]
                     j = i
 
+        # print(j)
         self.iterador = j
 
         # Obtenemos la columna para iterar
@@ -258,7 +255,7 @@ class Simplex:
                 ratio = valor_sol / valor
             except:
                 continue
-            # print(f"Ratio de {ratio} {valor_sol}/{valor}")
+            print(f"Ratio de {ratio} {valor_sol}/{valor}")
 
             if ratio < 0:
                 continue
@@ -288,13 +285,19 @@ class Simplex:
                 self.matriz[j][i][1] = para_uno * self.matriz[self.iterador_fila][i][1] + self.matriz[j][i][1] 
 
 
-matriz = [
-    [["x1", Compuesto(-6, 3)], ["x2", Compuesto(-10, 4)], ["s1", 0], ["s2", Compuesto(0, -1)], ["r1", 0], ["r2", 0],   ["Sol", Compuesto(0, 90)]],
-    [["s1", 1],     [None, 0],      [None, 1],     [None, 0],      [None, 0],      [None, 0],       [None, 12]],
-    [["r1", 3],     [None, 2],      [None, 0],     [None, 1],      [None, 1],      [None, 0],      [None, 54]],
-    [["r2", 0],     [None, 2],      [None, 0],     [None, 0],      [None, 0],      [None, 1],      [None, 36]],
-]
+# matriz = [
+#     [["x1", M(-6, 3)], ["x2", M(-10, 4)], ["s1", 0], ["s2", M(0, -1)], ["r1", 0], ["r2", 0],   ["Sol", M(0, 90)]],
+#     [["s1", 1],     [None, 0],      [None, 1],     [None, 0],      [None, 0],      [None, 0],       [None, 12]],
+#     [["r1", 3],     [None, 2],      [None, 0],     [None, 1],      [None, 1],      [None, 0],      [None, 54]],
+#     [["r2", 0],     [None, 2],      [None, 0],     [None, 0],      [None, 0],      [None, 1],      [None, 36]],
+# ]
 
+matriz = [
+    [["x1", M(1.1,-0.4)], ["x2", M(0.9,-0.5)], ["s1", 0], ["s2", M(-1)], ["r1", 0], ["r2", 0],   ["Sol", M(12,0)]],
+    [["s1", 0.3],   0.1,    1,     0,     0,     0,      2.7],
+    [["r1", 0.5],   0.5,    0,     0,     1,     0,      6],
+    [["r2", 0.6],   0.4,    0,    -1,     0,     1,      6],
+]
 simple = Simplex(matriz, es_maximizar=False)
 
 print(simple)
