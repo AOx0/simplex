@@ -1,45 +1,5 @@
 from fractions import Fraction, Decimal
 
-"""
-matriz = [
-    # First row & column is (tag, value)
-    [["x1", -3],     ["x2", -2],     ["x3", 0],     ["x4", 0],     ["x5", 0],  ["Solucion", 0]],
-    [["x3", 2],     [None, 1],      [None, 1],     [None, 0],      [None, 0],      [None, 18]],
-    [["x4", 2],     [None, 3],      [None, 0],     [None, 1],      [None, 0],      [None, 42]],
-    [["x5", 3],     [None, 1],      [None, 0],     [None, 0],      [None, 1],      [None, 24]],
-]
-
-matriz = [
-    # First row & column is (tag, value)
-    [["x1", -1],     ["x2", 2],     ["x3", 0],     ["x4", 0],     ["x5", 0],  ["Solucion", 0]],
-    [["x1", 1],     [None, 0],      [None, -1/2],     [None, 1/2],      [None, 0],      [None, 1/2]],
-    [["x2", 0],     [None, 1],      [None, -1/2],     [None, -1/2],      [None, 0],      [None, 3/2]],
-    [["x5", 0],     [None, 0],      [None, 1/2],     [None, 1/2],      [None, 1],      [None, 3/2]],
-]
-
-matriz = [
-    [["x1", -2],     ["x2", -5],     ["x3", 0],     ["x4", 0],     ["x5", 0],  ["Solucion", 0]],
-    [["x3", 1],     [None, 6],      [None, 1],     [None, 0],      [None, 0],      [None, 20]],
-    [["x4", 1],     [None, 1],      [None, 0],     [None, 1],      [None, 0],      [None, 60]],
-    [["x5", 1],     [None, 0],      [None, 0],     [None, 0],      [None, 1],      [None, 40]],
-]
-
-
-matriz = [
-    [["x1", -3],     ["x2", 2],     ["s1", 0],     ["s2", 0],     ["s3", 0],  ["Solucion", 0]],
-    [["s1", 2],     [None, 1],      [None, 1],     [None, 0],      [None, 0],      [None, 18]],
-    [["s2", 2],     [None, 3],      [None, 0],     [None, 1],      [None, 0],      [None, 42]],
-    [["s3", 3],     [None, -2],      [None, 0],     [None, 0],      [None, 1],      [None, 5]],
-]
-
-matriz = [
-    [["x1", -1],     ["x2", M(2, 2)],     ["s1", M(0, -1)],     ["s2", M(0, -1)],     ["r1", 0], ["r2", 0],["x5", 0],   ["Sol", M(0, 3)]],
-    [["s1", 1],     [None, 1],      [None, -1],     [None, 0],      [None, 1],      [None, 0],      [None, 0], [None, 2]],
-    [["r1", -1],     [None, 1],      [None, 0],     [None, -1],      [None, 0],      [None, 1],      [None, 0], [None, 1]],
-    [["r2", 0],     [None, 1],      [None, 0],     [None, 0],      [None, 0],      [None, 0],      [None, 1], [None, 3]],
-]
-"""
-
 class M:
     def __init__(self, m, i=0):
         self.m = Fraction(m).limit_denominator() if type(m) != Fraction else m
@@ -168,14 +128,6 @@ class Simplex:
     def __str__(self):
         from prettytable import PrettyTable
         x = PrettyTable()
-        result = ""
-        """
-        if self.iterador_fila is not None:
-            result += "Iterador fila: {0: <10}\n".format(self.iterador_fila)
-
-        if self.iterador is not None:
-            result += "Iterador: {0: <10}\n".format(self.iterador)
-        """
 
         names = [" "]
         for i in range(len(self.matriz[0])):
