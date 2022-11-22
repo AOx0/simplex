@@ -99,7 +99,7 @@ class M:
         elif self.i == 0:
             return f"{Fraction(self.m)}M"
         else:
-            return f"({Fraction(self.m)}M" + "," + f"{Fraction(self.i)})"
+            return f"{Fraction(self.m)}M | {Fraction(self.i)}"
 
     def __ge__(self, other):
         return float(self) >= float(other)
@@ -166,6 +166,8 @@ class Simplex:
         return sum(non_positive) == len(self.matriz[0])-1
 
     def __str__(self):
+        from prettytable import PrettyTable
+        x = PrettyTable()
         result = ""
         """
         if self.iterador_fila is not None:
@@ -175,31 +177,34 @@ class Simplex:
             result += "Iterador: {0: <10}\n".format(self.iterador)
         """
 
-        result += "\n{0: >10}".format("")
+        names = [" "]
         for i in range(len(self.matriz[0])):
             if self.iterador == i:
-                result += C.BOLD + C.RED + "{0: >10} ".format(str(self.matriz[0][i][0])) + C.END
+                names += [C.BOLD + C.RED + "{0}".format(str(self.matriz[0][i][0])) + C.END]
             else:
-                result += "{0: >10} ".format(str(self.matriz[0][i][0]))
-
-        result += "\n"
+                names += ["{0}".format(str(self.matriz[0][i][0]))]
+        # print(names)
+        x.field_names = names
 
         for j in range(len(self.matriz)):
+            row = []
+            # Row name
             if j == 0:
-                result += "{0: >10} ".format("z")
+                row += ["{0}".format("z")]
             else:
                 if self.iterador == i or self.iterador_fila == j:
-                    result += C.BOLD + C.RED + "{0: >10} ".format(str(self.matriz[j][0][0])) + C.END
+                    row += [C.BOLD + C.RED + "{0}".format(str(self.matriz[j][0][0])) + C.END]
                 else:
-                    result += "{0: >10} ".format(str(self.matriz[j][0][0]))
+                    row += ["{0}".format(str(self.matriz[j][0][0]))]
+            # Row values
             for i in range(len(self.matriz[j])):
                 if self.iterador == i or self.iterador_fila == j:
-                    result += C.BOLD + C.RED + "{0: >10} ".format(str(self.matriz[j][i][1])) + C.END
+                    row += [C.BOLD + C.RED + "{0}".format(str(self.matriz[j][i][1])) + C.END]
                 else:
-                    result += "{0: >10} ".format(str(self.matriz[j][i][1]))
-            result += "\n"
+                    row += ["{0}".format(str(self.matriz[j][i][1]))]
+            x.add_row(row)
 
-        return result
+        return x.__str__()
 
     def __repr__(self):
         return self.__str__()
@@ -284,13 +289,6 @@ class Simplex:
                 # print("A: ", a, " * ", para_uno, " + ", self.matriz[j][i][1])
                 self.matriz[j][i][1] = para_uno * self.matriz[self.iterador_fila][i][1] + self.matriz[j][i][1] 
 
-
-# matriz = [
-#     [["x1", M(-6, 3)], ["x2", M(-10, 4)], ["s1", 0], ["s2", M(0, -1)], ["r1", 0], ["r2", 0],   ["Sol", M(0, 90)]],
-#     [["s1", 1],     [None, 0],      [None, 1],     [None, 0],      [None, 0],      [None, 0],       [None, 12]],
-#     [["r1", 3],     [None, 2],      [None, 0],     [None, 1],      [None, 1],      [None, 0],      [None, 54]],
-#     [["r2", 0],     [None, 2],      [None, 0],     [None, 0],      [None, 0],      [None, 1],      [None, 36]],
-# ]
 
 matriz = [
     [["x1", M(1.1,-0.4)], ["x2", M(0.9,-0.5)], ["s1", 0], ["s2", M(-1)], ["r1", 0], ["r2", 0],   ["Sol", M(12,0)]],
