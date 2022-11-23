@@ -91,7 +91,7 @@ class C:
 
 
 class Simplex:
-    def __init__(self, matriz, es_maximizar: bool = True):
+    def __init__(self, matriz, es_maximizar: bool = True, ints_only: bool = False):
         for j in range(len(matriz)):
             for i in range(len(matriz[0])):
                 if type(matriz[j][i]) == list:
@@ -104,6 +104,7 @@ class Simplex:
         self.matriz = matriz
         self.iterador = None
         self.iterador_fila = None
+        self.int = ints_only
         return
 
     def check_consistencia(self):
@@ -114,7 +115,6 @@ class Simplex:
                 1 if self.matriz[0][i][1] >= M(0) else
                 0 for i in range(len(self.matriz[0])-1)
         ]
-        # print(non_negative)
         return sum(non_negative) == len(self.matriz[0])-1
 
     def stop_iter_min(self):
@@ -122,7 +122,6 @@ class Simplex:
                 1 if self.matriz[0][i][1] <= M(0) else
                 0 for i in range(len(self.matriz[0])-1)
         ]
-        # print(non_positive)
         return sum(non_positive) == len(self.matriz[0])-1
 
     def __str__(self):
@@ -177,11 +176,9 @@ class Simplex:
                 if self.matriz[0][i][1] == 0:
                     continue
                 if menor is None:
-                    # print("Primer menor:", self.matriz[0][i][1])
                     menor = self.matriz[0][i][1]
                     j = i
                 elif self.matriz[0][i][1] < menor:
-                    # print("Menor:", self.matriz[0][i][1])
                     menor = self.matriz[0][i][1]
                     j = i
         elif not es_maximizar:
@@ -190,15 +187,12 @@ class Simplex:
                 if self.matriz[0][i][1] == 0:
                     continue
                 if mayor is None:
-                    # print("Primer menor:", self.matriz[0][i][1])
                     mayor = self.matriz[0][i][1]
                     j = i
                 elif self.matriz[0][i][1] > mayor:
-                    # print("Menor:", self.matriz[0][i][1])
                     mayor = self.matriz[0][i][1]
                     j = i
 
-        # print(j)
         self.iterador = j
 
         # Obtenemos la columna para iterar
@@ -238,17 +232,17 @@ class Simplex:
             for i in range(len(self.matriz[j])):
                 a = self.matriz[self.iterador_fila][i][1]
                 para_uno = -1 * num
-                # print("A: ", a, " * ", para_uno, " + ", self.matriz[j][i][1])
                 self.matriz[j][i][1] = para_uno * self.matriz[self.iterador_fila][i][1] + self.matriz[j][i][1] 
 
 
 matriz = [
-    [["x1", M(1.1,-0.4)], ["x2", M(0.9,-0.5)], ["s1", 0], ["s2", M(-1)], ["r1", 0], ["r2", 0],   ["Sol", M(12,0)]],
-    [["s1", 0.3],   0.1,    1,     0,     0,     0,      2.7],
-    [["r1", 0.5],   0.5,    0,     0,     1,     0,      6],
-    [["r2", 0.6],   0.4,    0,    -1,     0,     1,      6],
+    [["x1", -50], ["x2", -20], ["x3", -25], ["s1", 0], ["s2", 0], ["s3", 0], ["s4", 0], ["sol", 0]],
+    [["s1", 9], 3, 5, 1, 0, 0, 0, 500],
+    [["s2", 5], 4, 0, 0, 1, 0, 0, 350],
+    [["s3", 3], 0, 3, 0, 0, 1, 0, 150],
+    [["s4", 0], 0, 1, 0, 0, 0, 1, 20]
 ]
-simple = Simplex(matriz, es_maximizar=False)
+simple = Simplex(matriz, es_maximizar=True)
 
 print(simple)
 
